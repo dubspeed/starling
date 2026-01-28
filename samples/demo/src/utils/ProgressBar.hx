@@ -1,8 +1,8 @@
 package utils;
-import flash.display.GradientType;
-import flash.display.Shape;
-import flash.display.Sprite;
-import flash.geom.Matrix;
+import openfl.display.GradientType;
+import openfl.display.Shape;
+import openfl.display.Sprite;
+import openfl.geom.Matrix;
 
 class ProgressBar extends Sprite
 {
@@ -14,20 +14,20 @@ class ProgressBar extends Sprite
         super();
         init(width, height);
     }
-    
+
     private function init(width:Int, height:Int):Void
     {
         var padding:Float = height * 0.2;
         var cornerRadius:Float = padding * 2;
-        
+
         // create black rounded box for background
-        
+
         mBackground = new Shape();
         mBackground.graphics.beginFill(0x0, 0.5);
         mBackground.graphics.drawRoundRect(0, 0, width, height, cornerRadius, cornerRadius);
         mBackground.graphics.endFill();
         addChild(mBackground);
-        
+
         // create progress bar shape
 
         var barWidth:Float  = width  - 2 * padding;
@@ -44,10 +44,10 @@ class ProgressBar extends Sprite
         mBar.scaleX = 0.0;
         addChild(mBar);
     }
-    
+
     public var ratio(get, set):Float;
     @:noCompletion private function get_ratio():Float { return mBar.scaleX; }
-    @:noCompletion private function set_ratio(value:Float):Float 
+    @:noCompletion private function set_ratio(value:Float):Float
     {
         mBar.scaleX = Math.max(0.0, Math.min(1.0, value));
         return get_ratio();

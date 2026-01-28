@@ -10,24 +10,19 @@
 
 package starling.textures;
 
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.display3D.Context3D;
-import flash.display3D.Context3DTextureFormat;
-import flash.display3D.textures.TextureBase;
-import flash.errors.Error;
-import flash.geom.Matrix;
-import flash.geom.Point;
-import flash.geom.Rectangle;
-#if flash
-import flash.media.Camera;
-#end
-import flash.net.NetStream;
-import flash.utils.ByteArray;
-import haxe.Timer;
-
 import haxe.Constraints.Function;
-
+import haxe.Timer;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+import openfl.display3D.Context3D;
+import openfl.display3D.Context3DTextureFormat;
+import openfl.display3D.textures.TextureBase;
+import openfl.errors.Error;
+import openfl.geom.Matrix;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import openfl.net.NetStream;
+import openfl.utils.ByteArray;
 import starling.core.RenderSupport;
 import starling.core.Starling;
 import starling.errors.MissingContextError;
@@ -35,12 +30,15 @@ import starling.errors.NotSupportedError;
 import starling.events.Event;
 import starling.utils.Color;
 import starling.utils.SystemUtil;
+#if flash
+import openfl.media.Camera;
+#end
 
 /** A ConcreteTexture wraps a Stage3D texture object, storing the properties of the texture. */
 class ConcreteTexture extends Texture
 {
     private static inline var TEXTURE_READY:String = "textureReady"; // defined here for backwards compatibility
-    
+
     private var mBase:TextureBase;
     private var mFormat:Context3DTextureFormat;
     private var mWidth:Int;
@@ -53,13 +51,13 @@ class ConcreteTexture extends Texture
     private var mOnRestore:Function;
     private var mDataUploaded:Bool;
     private var mTextureReadyCallback:Function;
-    
+
     /** helper object */
     private static var sOrigin:Point = new Point();
-    
+
     /** Creates a ConcreteTexture object from a TextureBase, storing information about size,
      * mip-mapping, and if the channels contain premultiplied alpha values. */
-    public function new(base:TextureBase, format:Context3DTextureFormat, width:Int, height:Int, 
+    public function new(base:TextureBase, format:Context3DTextureFormat, width:Int, height:Int,
                         mipMapping:Bool, premultipliedAlpha:Bool,
                         optimizedForRenderTexture:Bool=false,
                         scale:Float=1, repeat:Bool=false)
@@ -78,7 +76,7 @@ class ConcreteTexture extends Texture
         mDataUploaded = false;
         mTextureReadyCallback = null;
     }
-    
+
     /** Disposes the TextureBase object. */
     public override function dispose():Void
     {
@@ -91,9 +89,9 @@ class ConcreteTexture extends Texture
         this.onRestore = null; // removes event listener
         super.dispose();
     }
-    
+
     // texture data upload
-    
+
     /** Uploads a bitmap to the texture. The existing contents will be replaced.
      * If the size of the bitmap does not match the size of the texture, the bitmap will be
      * cropped or filled up with transparent pixels */
@@ -101,7 +99,7 @@ class ConcreteTexture extends Texture
     {
         uploadBitmapData(bitmap.bitmapData);
     }
-    
+
     /** Uploads bitmap data to the texture. The existing contents will be replaced.
      * If the size of the bitmap does not match the size of the texture, the bitmap will be
      * cropped or filled up with transparent pixels */
@@ -113,7 +111,7 @@ class ConcreteTexture extends Texture
                   "may cause a crash on some platforms. Ignoring request.");
             return;
         }
-		
+
 		var doAsync:Bool = false;
         if (Reflect.isFunction(async))
         {
@@ -128,25 +126,25 @@ class ConcreteTexture extends Texture
 		#end
 
         var potData:BitmapData = null;
-        
+
         if (data.width != mWidth || data.height != mHeight)
         {
             potData = new BitmapData(mWidth, mHeight, true, 0);
             potData.copyPixels(data, data.rect, sOrigin);
             data = potData;
         }
-        
-        if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.Texture))
+
+        if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.Texture))
         {
-            var potTexture:flash.display3D.textures.Texture = 
+            var potTexture:openfl.display3D.textures.Texture =
                 cast mBase;
-            
+
 			if (doAsync){
 				untyped potTexture.uploadFromBitmapDataAsync(data);
 			}else{
 				potTexture.uploadFromBitmapData(data);
 			}
-            
+
             if (mMipMapping && data.width > 1 && data.height > 1)
             {
                 var currentWidth:Int  = data.width  >> 1;
@@ -155,7 +153,7 @@ class ConcreteTexture extends Texture
                 var canvas:BitmapData = new BitmapData(currentWidth, currentHeight, true, 0);
                 var transform:Matrix = new Matrix(.5, 0, 0, .5);
                 var bounds:Rectangle = new Rectangle();
-                
+
                 while (currentWidth >= 1 || currentHeight >= 1)
                 {
                     bounds.width = currentWidth; bounds.height = currentHeight;
@@ -166,32 +164,32 @@ class ConcreteTexture extends Texture
                     currentWidth  = currentWidth  >> 1;
                     currentHeight = currentHeight >> 1;
                 }
-                
+
                 canvas.dispose();
             }
         }
-        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.RectangleTexture))
+        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.RectangleTexture))
         {
-            var baseTexture:flash.display3D.textures.RectangleTexture = cast mBase;
-            
+            var baseTexture:openfl.display3D.textures.RectangleTexture = cast mBase;
+
 			if (doAsync){
 				untyped baseTexture.uploadFromBitmapDataAsync(data);
 			}else{
 				baseTexture.uploadFromBitmapData(data);
 			}
         }
-        
+
         if (potData != null) potData.dispose();
         mDataUploaded = true;
-		
+
 		if (!doAsync && Reflect.isFunction(async)){
 			Timer.delay (onTextureReady.bind(null), 1);
 		}
     }
-    
+
     /** Uploads ATF data from a ByteArray to the texture. Note that the size of the
      * ATF-encoded data must be exactly the same as the original texture size.
-     * 
+     *
      * <p>The 'async' parameter may be either a boolean value or a callback function.
      * If it's <code>false</code> or <code>null</code>, the texture will be decoded
      * synchronously and will be visible right away. If it's <code>true</code> or a function,
@@ -202,18 +200,18 @@ class ConcreteTexture extends Texture
     public function uploadAtfData(data:ByteArray, offset:Int=0, async:Dynamic=null):Void
     {
         var isAsync:Bool = Reflect.isFunction(async) || async == true;
-        var potTexture:flash.display3D.textures.Texture = 
-              #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.Texture) ? cast mBase : null;
-        
+        var potTexture:openfl.display3D.textures.Texture =
+              #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.Texture) ? cast mBase : null;
+
         if (potTexture == null)
             throw new Error("This texture type does not support ATF data");
-        
+
         if (Reflect.isFunction(async))
         {
             mTextureReadyCallback = async;
             mBase.addEventListener(TEXTURE_READY, onTextureReady);
         }
-        
+
         potTexture.uploadCompressedTextureFromByteArray(data, offset, isAsync);
         mDataUploaded = true;
     }
@@ -234,7 +232,7 @@ class ConcreteTexture extends Texture
     {
         var className:String = Type.getClassName(Type.getClass(mBase));
 
-        if (className == "flash.display3D.textures.VideoTexture")
+        if (className == "openfl.display3D.textures.VideoTexture")
         {
             mDataUploaded = true;
             mTextureReadyCallback = onComplete;
@@ -250,19 +248,19 @@ class ConcreteTexture extends Texture
         if (mTextureReadyCallback != null) mTextureReadyCallback(this);
         mTextureReadyCallback = null;
     }
-    
+
     // texture backup (context loss)
-    
+
     private function onContextCreated():Void
     {
         // recreate the underlying texture & restore contents
         createBase();
         if (mOnRestore != null) mOnRestore();
-        
+
         // if no texture has been uploaded above, we init the texture with transparent pixels.
         if (!mDataUploaded) clear();
     }
-    
+
     /** Recreates the underlying Stage3D texture object with the same dimensions and attributes
      * as the one that was passed to the constructor. You have to upload new data before the
      * texture becomes usable again. Beware: this method does <strong>not</strong> dispose
@@ -270,15 +268,15 @@ class ConcreteTexture extends Texture
     private function createBase():Void
     {
         var context:Context3D = Starling.current.context;
-        
-        if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.Texture))
-            mBase = context.createTexture(mWidth, mHeight, mFormat, 
+
+        if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.Texture))
+            mBase = context.createTexture(mWidth, mHeight, mFormat,
                                           mOptimizedForRenderTexture);
-        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.RectangleTexture))
+        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.RectangleTexture))
             mBase = context.createRectangleTexture (mWidth, mHeight, mFormat,
                                                       mOptimizedForRenderTexture);
         #if flash
-        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, flash.display3D.textures.VideoTexture))
+        else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end(mBase, openfl.display3D.textures.VideoTexture))
             mBase = Reflect.callMethod(context, Reflect.getProperty(context, "createVideoTexture"), []);
         #end
         else
@@ -286,39 +284,39 @@ class ConcreteTexture extends Texture
 
         mDataUploaded = false;
     }
-    
+
     /** Clears the texture with a certain color and alpha value. The previous contents of the
-     * texture is wiped out. Beware: this method resets the render target to the back buffer; 
-     * don't call it from within a render method. */ 
+     * texture is wiped out. Beware: this method resets the render target to the back buffer;
+     * don't call it from within a render method. */
     public function clear(color:UInt=0x0, alpha:Float=0.0):Void
     {
         var context:Context3D = Starling.current.context;
         if (context == null) throw new MissingContextError();
-        
+
         if (mPremultipliedAlpha && alpha < 1.0)
             color = Color.rgb(Std.int(Color.getRed(color)   * alpha),
                               Std.int(Color.getGreen(color) * alpha),
                               Std.int(Color.getBlue(color)  * alpha));
-        
+
         context.setRenderToTexture(mBase);
-        
+
         // we wrap the clear call in a try/catch block as a workaround for a problem of
         // FP 11.8 plugin/projector: calling clear on a compressed texture doesn't work there
         // (while it *does* work on iOS + Android).
-        
+
         try { RenderSupport._clear(color, alpha); }
         catch (e:Error) {}
-        
+
         context.setRenderToBackBuffer();
         mDataUploaded = true;
     }
-    
+
     // properties
-    
+
     /** Indicates if the base texture was optimized for being used in a render texture. */
     public var optimizedForRenderTexture(get, never):Bool;
     private function get_optimizedForRenderTexture():Bool { return mOptimizedForRenderTexture; }
-    
+
     /** If Starling's "handleLostContext" setting is enabled, the function that you provide
      * here will be called after a context loss. On execution, a new base texture will
      * already have been created; however, it will be empty. Call one of the "upload..."
@@ -329,7 +327,7 @@ class ConcreteTexture extends Texture
     {
         if (Starling.current != null)
             Starling.current.removeEventListener(Event.CONTEXT3D_CREATE, onContextCreated);
-        
+
         if (Starling.handleLostContext && value != null)
         {
             mOnRestore = value;
@@ -338,37 +336,37 @@ class ConcreteTexture extends Texture
         else mOnRestore = null;
         return value;
     }
-    
+
     /** @inheritDoc */
     private override function get_base():TextureBase { return mBase; }
-    
+
     /** @inheritDoc */
     private override function get_root():ConcreteTexture { return this; }
-    
+
     /** @inheritDoc */
     private override function get_format():Context3DTextureFormat { return mFormat; }
-    
+
     /** @inheritDoc */
     private override function get_width():Float  { return mWidth / mScale;  }
-    
+
     /** @inheritDoc */
     private override function get_height():Float { return mHeight / mScale; }
-    
+
     /** @inheritDoc */
     private override function get_nativeWidth():Float { return mWidth; }
-    
+
     /** @inheritDoc */
     private override function get_nativeHeight():Float { return mHeight; }
-    
+
     /** The scale factor, which influences width and height properties. */
     private override function get_scale():Float { return mScale; }
-    
+
     /** @inheritDoc */
     private override function get_mipMapping():Bool { return mMipMapping; }
-    
+
     /** @inheritDoc */
     private override function get_premultipliedAlpha():Bool { return mPremultipliedAlpha; }
-    
+
     /** @inheritDoc */
     private override function get_repeat():Bool { return mRepeat; }
-} 
+}

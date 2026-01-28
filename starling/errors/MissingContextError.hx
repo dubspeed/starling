@@ -10,9 +10,9 @@
 
 package starling.errors;
 
-import flash.errors.Error;
+import openfl.errors.Error;
 
-/** A MissingContextError is thrown when a Context3D object is required but not (yet) 
+/** A MissingContextError is thrown when a Context3D object is required but not (yet)
  *  available. */
 class MissingContextError extends Error
 {

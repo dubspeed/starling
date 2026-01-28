@@ -10,10 +10,10 @@
 
 package starling.textures;
 
-import flash.display3D.Context3DTextureFormat;
-import flash.errors.ArgumentError;
-import flash.errors.Error;
-import flash.utils.ByteArray;
+import openfl.display3D.Context3DTextureFormat;
+import openfl.errors.ArgumentError;
+import openfl.errors.Error;
+import openfl.utils.ByteArray;
 
 /** A parser for the ATF data format. */
 class AtfData
@@ -24,12 +24,12 @@ class AtfData
     private var mNumTextures:Int;
     private var mIsCubeMap:Bool;
     private var mData:ByteArray;
-    
+
     /** Create a new instance by parsing the given byte array. */
     public function new(data:ByteArray)
     {
         if (!isAtfData(data)) throw new ArgumentError("Invalid ATF data");
-        
+
         if (data[6] == 255) data.position = 12; // new file version
         else                data.position =  6; // old file version
 
@@ -41,16 +41,16 @@ class AtfData
             case 13, 4, 5: mFormat = Context3DTextureFormat.COMPRESSED_ALPHA/*"compressedAlpha"*/; // explicit string for compatibility
             default: throw new Error("Invalid ATF format");
         }
-        
-        mWidth = Std.int(Math.pow(2, data.readUnsignedByte())); 
+
+        mWidth = Std.int(Math.pow(2, data.readUnsignedByte()));
         mHeight = Std.int(Math.pow(2, data.readUnsignedByte()));
         mNumTextures = data.readUnsignedByte();
         mIsCubeMap = (format & 0x80) != 0;
         mData = data;
-        
+
         // version 2 of the new file format contains information about
         // the "-e" and "-n" parameters of png2atf
-        
+
         if (data[5] != 0 && data[6] == 255)
         {
             var emptyMipmaps:Bool = (data[5] & 0x01) == 1;
@@ -72,7 +72,7 @@ class AtfData
         }
     }
 
-    /** The texture format. @see flash.display3D.textures.Context3DTextureFormat */
+    /** The texture format. @see openfl.display3D.textures.Context3DTextureFormat */
     public var format(get, never):Context3DTextureFormat;
     private function get_format():Context3DTextureFormat { return mFormat; }
 

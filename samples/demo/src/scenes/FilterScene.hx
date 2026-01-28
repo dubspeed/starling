@@ -1,7 +1,6 @@
 package scenes;
-import flash.display.BitmapData;
-import flash.display.BitmapDataChannel;
-
+import openfl.display.BitmapData;
+import openfl.display.BitmapDataChannel;
 import starling.core.Starling;
 import starling.display.Button;
 import starling.display.Image;
@@ -18,7 +17,7 @@ import starling.textures.Texture;
     private var mImage:Image;
     private var mInfoText:TextField;
     private var mFilterInfos:Array<Dynamic>;
-    
+
     public function new()
     {
         super();
@@ -28,30 +27,30 @@ import starling.textures.Texture;
         mButton.y = 15;
         mButton.addEventListener(Event.TRIGGERED, onButtonTriggered);
         addChild(mButton);
-        
+
         mImage = new Image(Game.assets.getTexture("starling_rocket"));
         mImage.x = Std.int(Constants.CenterX - mImage.width / 2);
         mImage.y = 170;
         addChild(mImage);
-        
+
         mInfoText = new TextField(300, 32, "", "DejaVu Sans", 19);
         mInfoText.x = 10;
         mInfoText.y = 330;
         addChild(mInfoText);
-        
+
         initFilters();
         onButtonTriggered();
     }
-    
+
     private function onButtonTriggered():Void
     {
         var filterInfo:Array<Dynamic> = mFilterInfos.shift();
         mFilterInfos.push(filterInfo);
-        
+
         mInfoText.text = filterInfo[0];
         mImage.filter  = filterInfo[1];
     }
-    
+
     private function initFilters():Void
     {
         mFilterInfos = [
@@ -60,24 +59,24 @@ import starling.textures.Texture;
             ["Drop Shadow", BlurFilter.createDropShadow()],
             ["Glow", BlurFilter.createGlow()]
         ];
-        
+
         var displacementFilter:DisplacementMapFilter = new DisplacementMapFilter(
             createDisplacementMap(mImage.width, mImage.height), null,
             cast BitmapDataChannel.RED, cast BitmapDataChannel.GREEN, 25, 25);
         mFilterInfos.push(["Displacement Map", displacementFilter]);
-        
+
         var invertFilter:ColorMatrixFilter = new ColorMatrixFilter();
         invertFilter.invert();
         mFilterInfos.push(["Invert", invertFilter]);
-        
+
         var grayscaleFilter:ColorMatrixFilter = new ColorMatrixFilter();
         grayscaleFilter.adjustSaturation(-1);
         mFilterInfos.push(["Grayscale", grayscaleFilter]);
-        
+
         var saturationFilter:ColorMatrixFilter = new ColorMatrixFilter();
         saturationFilter.adjustSaturation(1);
         mFilterInfos.push(["Saturation", saturationFilter]);
-        
+
         var contrastFilter:ColorMatrixFilter = new ColorMatrixFilter();
         contrastFilter.adjustContrast(0.75);
         mFilterInfos.push(["Contrast", contrastFilter]);
@@ -90,7 +89,7 @@ import starling.textures.Texture;
         hueFilter.adjustHue(1);
         mFilterInfos.push(["Hue", hueFilter]);
     }
-    
+
     private function createDisplacementMap(width:Float, height:Float):Texture
     {
         var scale:Float = Starling.current.contentScaleFactor;

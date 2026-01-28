@@ -10,21 +10,18 @@
 
 package starling.utils;
 
-import flash.display3D.Context3D;
-import flash.events.Event;
-import flash.events.EventDispatcher;
-import flash.system.Capabilities;
-import flash.Lib;
-
 import haxe.Constraints.Function;
-
 import lime.app.Application;
-
+import openfl.Lib;
+import openfl.display3D.Context3D;
+import openfl.errors.Error;
+import openfl.events.Event;
+import openfl.events.EventDispatcher;
+import openfl.system.Capabilities;
 #if (lime < "7.0.0")
 import lime.app.Config.WindowConfig;
 #end
 
-import openfl.errors.Error;
 
 /** A utility class with methods related to the current platform and runtime. */
 class SystemUtil
@@ -36,17 +33,17 @@ class SystemUtil
     private static var sVersion:String;
     private static var sAIR:Bool;
     private static var sSupportsDepthAndStencil:Bool = true;
-    
+
     /** Initializes the <code>ACTIVATE/DEACTIVATE</code> event handlers on the native
      * application. This method is automatically called by the Starling constructor. */
     public static function initialize():Void
     {
         if (sInitialized) return;
-        
+
         sInitialized = true;
         sPlatform = Capabilities.version.substr(0, 3);
         sVersion = Capabilities.version.substr(4);
-        
+
         try
         {
             var nativeApp = Lib.current;
@@ -70,7 +67,7 @@ class SystemUtil
             #else
             sSupportsDepthAndStencil = true;
             #end
-            
+
             #if air
             sAIR = true;
             #end
@@ -80,11 +77,11 @@ class SystemUtil
             sAIR = false;
         }
     }
-    
+
     private static function onActivate(event:Dynamic):Void
     {
         sApplicationActive = true;
-        
+
         for (call in sWaitingCalls)
         {
             try { Reflect.callMethod(null, call[0], call[1]); }
@@ -96,18 +93,18 @@ class SystemUtil
 
         sWaitingCalls = [];
     }
-    
+
     private static function onDeactivate(event:Dynamic):Void
     {
         sApplicationActive = false;
     }
-    
+
     /** Executes the given function with its arguments the next time the application is active.
      * (If it <em>is</em> active already, the call will be executed right away.) */
     public static function executeWhenApplicationIsActive(call:Function, args:Array<Dynamic>):Void
     {
         initialize();
-        
+
         if (args == null) args = [];
         if (sApplicationActive) Reflect.callMethod(call, call, args);
         else sWaitingCalls.push([call, args]);
@@ -131,7 +128,7 @@ class SystemUtil
         initialize();
         return sAIR;
     }
-    
+
     /** Indicates if the code is executed on a Desktop computer with Windows, OS X or Linux
      * operating system. If the method returns 'false', it's probably a mobile device
      * or a Smart TV. */
@@ -142,7 +139,7 @@ class SystemUtil
         return #if desktop true #else false #end;
         //return ~/(WIN|MAC|LNX)/.match(sPlatform);
     }
-    
+
     /** Returns the three-letter platform string of the current system. These are
      * the most common platforms: <code>WIN, MAC, LNX, IOS, AND, QNX</code>. Except for the
      * last one, which indicates "Blackberry", all should be self-explanatory. */

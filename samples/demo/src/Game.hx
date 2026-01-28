@@ -1,12 +1,7 @@
 package;
-import flash.system.System;
-import flash.ui.Keyboard;
-#if 0
-import flash.utils.getDefinitionByName;
-#end
-
+import openfl.system.System;
+import openfl.ui.Keyboard;
 import scenes.Scene;
-
 import starling.core.Starling;
 import starling.display.Button;
 import starling.display.Image;
@@ -14,6 +9,10 @@ import starling.display.Sprite;
 import starling.events.Event;
 import starling.events.KeyboardEvent;
 import starling.utils.AssetManager;
+#if 0
+import openfl.utils.getDefinitionByName;
+#end
+
 
 @:keep class Game extends Sprite
 {
@@ -22,18 +21,18 @@ import starling.utils.AssetManager;
     [Embed(source="../../demo/assets/fonts/Ubuntu-R.ttf", embedAsCFF="false", fontFamily="Ubuntu")]
     private static const UbuntuRegular:Class;
     #end
-    
+
     private var mMainMenu:MainMenu;
     private var mCurrentScene:Scene;
-    
+
     private static var sAssets:AssetManager;
-    
+
     public function new()
     {
         super();
         // nothing to do here -- Startup will call "start" immediately.
     }
-    
+
     public function start(assets:AssetManager):Void
     {
         sAssets = assets;
@@ -43,7 +42,7 @@ import starling.utils.AssetManager;
         addEventListener(Event.TRIGGERED, onButtonTriggered);
         stage.addEventListener(KeyboardEvent.KEY_DOWN, onKey);
     }
-    
+
     private function showMainMenu():Void
     {
         // now would be a good time for a clean-up
@@ -51,13 +50,13 @@ import starling.utils.AssetManager;
         System.pauseForGCIfCollectionImminent(0);
         #end
         System.gc();
-        
+
         if (mMainMenu == null)
             mMainMenu = new MainMenu();
-        
+
         addChild(mMainMenu);
     }
-    
+
     private function onKey(event:KeyboardEvent):Void
     {
         if (event.keyCode == Keyboard.SPACE)
@@ -65,34 +64,34 @@ import starling.utils.AssetManager;
         else if (event.keyCode == Keyboard.X)
             Starling.current.context.dispose();
     }
-    
+
     private function onButtonTriggered(event:Event):Void
     {
         var button:Button = cast(event.target, Button);
-        
+
         if (button.name == "backButton")
             closeScene();
         else
             showScene(button.name);
     }
-    
+
     private function closeScene():Void
     {
         mCurrentScene.removeFromParent(true);
         mCurrentScene = null;
         showMainMenu();
     }
-    
+
     private function showScene(name:String):Void
     {
         if (mCurrentScene != null) return;
-        
+
         var sceneClass:Class<Dynamic> = Type.resolveClass(name);
         mCurrentScene = cast(Type.createInstance(sceneClass, []), Scene);
         mMainMenu.removeFromParent();
         addChild(mCurrentScene);
     }
-    
+
     public static var assets(get, never):AssetManager;
     @:noCompletion private static function get_assets():AssetManager { return sAssets; }
 }

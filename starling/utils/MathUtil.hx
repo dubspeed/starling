@@ -10,8 +10,8 @@
 
 package starling.utils;
 
-import flash.geom.Point;
-import flash.geom.Vector3D;
+import openfl.geom.Point;
+import openfl.geom.Vector3D;
 
 /** A utility class containing methods you might need for maths problems. */
 class MathUtil
@@ -54,7 +54,7 @@ class MathUtil
     {
         return value < min ? min : (value > max ? max : value);
     }
-    
+
     /** Returns the smallest value in an array. */
     public static function min(values:Array<Float>):Float
     {
@@ -66,13 +66,13 @@ class MathUtil
                 min = values[i];
         return min;
     }
-    
+
     /** Converts an angle from degrees into radians. */
     public static function deg2rad(deg:Float):Float
     {
         return deg / 180.0 * Math.PI;
     }
-    
+
     /** Converts an angle from radians into degrees. */
     public static function rad2deg(rad:Float):Float
     {

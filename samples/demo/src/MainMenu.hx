@@ -1,6 +1,6 @@
 package;
 #if 0
-import flash.utils.getQualifiedClassName;
+import openfl.utils.getQualifiedClassName;
 #end
 
 import scenes.AnimationScene;
@@ -15,11 +15,6 @@ import scenes.Sprite3DScene;
 import scenes.TextScene;
 import scenes.TextureScene;
 import scenes.TouchScene;
-
-#if demo_video
-import scenes.VideoScene;
-#end
-
 import starling.core.Starling;
 import starling.display.Button;
 import starling.display.Image;
@@ -29,6 +24,10 @@ import starling.events.TouchPhase;
 import starling.text.TextField;
 import starling.textures.Texture;
 import starling.utils.VAlign;
+#if demo_video
+import scenes.VideoScene;
+#end
+
 
 class MainMenu extends Sprite
 {
@@ -37,12 +36,12 @@ class MainMenu extends Sprite
         super();
         init();
     }
-    
+
     private function init():Void
     {
         var logo:Image = new Image(Game.assets.getTexture("logo"));
         addChild(logo);
-        
+
         var scenesToCreate:Array<Array<Dynamic>> = [
             ["Textures", TextureScene],
             ["Multitouch", TouchScene],
@@ -60,30 +59,30 @@ class MainMenu extends Sprite
             ,["Video", VideoScene]
             #end
         ];
-        
+
         var buttonTexture:Texture = Game.assets.getTexture("button_medium");
         var count:Int = 0;
-        
+
         for (sceneToCreate in scenesToCreate)
         {
             var sceneTitle:String = sceneToCreate[0];
             var sceneClass:Class<Dynamic>  = sceneToCreate[1];
-            
+
             var button:Button = new Button(buttonTexture, sceneTitle);
             button.fontName = "DejaVu Sans";
             button.x = count % 2 == 0 ? 28 : 167;
             button.y = #if demo_video 145 #else 155 #end + Std.int(count / 2) * 46;
             button.name = Type.getClassName(sceneClass);
             addChild(button);
-            
+
             if (scenesToCreate.length % 2 != 0 && count % 2 == 1)
                 button.y += 24;
-            
+
             ++count;
         }
-        
+
         // show information about rendering method (hardware/software)
-        
+
         var driverInfo:String = Starling.current.context.driverInfo;
         var infoText:TextField = new TextField(310, 64, driverInfo, "DejaVu Sans", 10);
         infoText.x = 5;
@@ -92,7 +91,7 @@ class MainMenu extends Sprite
         infoText.addEventListener(TouchEvent.TOUCH, onInfoTextTouched);
         addChildAt(infoText, 0);
     }
-    
+
     private function onInfoTextTouched(event:TouchEvent):Void
     {
         if (event.getTouch(this, TouchPhase.ENDED) != null)

@@ -16,9 +16,8 @@ import haxe.xml.Access;
 import haxe.xml.Fast in Access;
 #end
 
-import flash.display3D.Context3DBlendFactor;
-import flash.errors.ArgumentError;
-
+import openfl.display3D.Context3DBlendFactor;
+import openfl.errors.ArgumentError;
 import starling.textures.Texture;
 import starling.utils.MathUtil;
 
@@ -58,15 +57,15 @@ class PDParticleSystem extends ParticleSystem
     public var startColorVariance(get, set):ColorArgb;
     public var endColor(get, set):ColorArgb;
     public var endColorVariance(get, set):ColorArgb;
-    
+
     private static inline var EMITTER_TYPE_GRAVITY:Int = 0;
     private static inline var EMITTER_TYPE_RADIAL:Int  = 1;
-    
+
     // emitter configuration                           // .pex element name
     private var mEmitterType:Int;                      // emitterType
     private var mEmitterXVariance:Float;               // sourcePositionVariance x
     private var mEmitterYVariance:Float;               // sourcePositionVariance y
-    
+
     // particle configuration
     private var mMaxNumParticles:Int;                  // maxParticles
     private var mLifespan:Float;                       // particleLifeSpan
@@ -81,7 +80,7 @@ class PDParticleSystem extends ParticleSystem
     private var mStartRotationVariance:Float;          // rotationStartVariance
     private var mEndRotation:Float;                    // rotationEnd
     private var mEndRotationVariance:Float;            // rotationEndVariance
-    
+
     // gravity configuration
     private var mSpeed:Float;                          // speed
     private var mSpeedVariance:Float;                  // speedVariance
@@ -91,7 +90,7 @@ class PDParticleSystem extends ParticleSystem
     private var mRadialAccelerationVariance:Float;     // radialAccelerationVariance
     private var mTangentialAcceleration:Float;         // tangentialAcceleration
     private var mTangentialAccelerationVariance:Float; // tangentialAccelerationVariance
-    
+
     // radial configuration
     private var mMaxRadius:Float;                      // maxRadius
     private var mMaxRadiusVariance:Float;              // maxRadiusVariance
@@ -99,51 +98,51 @@ class PDParticleSystem extends ParticleSystem
     private var mMinRadiusVariance:Float;              // minRadiusVariance
     private var mRotatePerSecond:Float;                // rotatePerSecond
     private var mRotatePerSecondVariance:Float;        // rotatePerSecondVariance
-    
+
     // color configuration
     private var mStartColor:ColorArgb;                 // startColor
     private var mStartColorVariance:ColorArgb;         // startColorVariance
     private var mEndColor:ColorArgb;                   // finishColor
     private var mEndColorVariance:ColorArgb;           // finishColorVariance
-    
+
     public function new(config:String, texture:Texture)
     {
         parseConfig(config);
-        
+
         var emissionRate:Float = mMaxNumParticles / mLifespan;
         super(texture, emissionRate, mMaxNumParticles, mMaxNumParticles,
               mBlendFactorSource, mBlendFactorDestination);
     }
-    
+
     private override function createParticle():Particle
     {
         return new PDParticle();
     }
-    
+
     private override function initParticle(aParticle:Particle):Void
     {
         var particle:PDParticle = cast aParticle;
-     
+
         // for performance reasons, the random variances are calculated inline instead
         // of calling a function
-        
+
         var lifespan:Float = mLifespan + mLifespanVariance * (Math.random() * 2.0 - 1.0);
-        
+
         particle.currentTime = 0.0;
         particle.totalTime = lifespan > 0.0 ? lifespan : 0.0;
-        
+
         if (lifespan <= 0.0) return;
-        
+
         particle.x = mEmitterX + mEmitterXVariance * (Math.random() * 2.0 - 1.0);
         particle.y = mEmitterY + mEmitterYVariance * (Math.random() * 2.0 - 1.0);
         particle.startX = mEmitterX;
         particle.startY = mEmitterY;
-        
+
         var angle:Float = mEmitAngle + mEmitAngleVariance * (Math.random() * 2.0 - 1.0);
         var speed:Float = mSpeed + mSpeedVariance * (Math.random() * 2.0 - 1.0);
         particle.velocityX = speed * Math.cos(angle);
         particle.velocityY = speed * Math.sin(angle);
-        
+
         var startRadius:Float = mMaxRadius + mMaxRadiusVariance * (Math.random() * 2.0 - 1.0);
         var endRadius:Float = mMinRadius + mMinRadiusVariance * (Math.random() * 2.0 - 1.0);
         particle.emitRadius = startRadius;
@@ -152,29 +151,29 @@ class PDParticleSystem extends ParticleSystem
         particle.emitRotationDelta = mRotatePerSecond + mRotatePerSecondVariance * (Math.random() * 2.0 - 1.0);
         particle.radialAcceleration = mRadialAcceleration + mRadialAccelerationVariance * (Math.random() * 2.0 - 1.0);
         particle.tangentialAcceleration = mTangentialAcceleration + mTangentialAccelerationVariance * (Math.random() * 2.0 - 1.0);
-        
+
         var startSize:Float = mStartSize + mStartSizeVariance * (Math.random() * 2.0 - 1.0);
         var endSize:Float = mEndSize + mEndSizeVariance * (Math.random() * 2.0 - 1.0);
         if (startSize < 0.1) startSize = 0.1;
         if (endSize < 0.1)   endSize = 0.1;
         particle.scale = startSize / texture.width;
         particle.scaleDelta = ((endSize - startSize) / lifespan) / texture.width;
-        
+
         // colors
-        
+
         var startColor:ColorArgb = particle.colorArgb;
         var colorDelta:ColorArgb = particle.colorArgbDelta;
-        
+
         startColor.red   = mStartColor.red;
         startColor.green = mStartColor.green;
         startColor.blue  = mStartColor.blue;
         startColor.alpha = mStartColor.alpha;
-        
+
         if (mStartColorVariance.red != 0)   startColor.red   += mStartColorVariance.red   * (Math.random() * 2.0 - 1.0);
         if (mStartColorVariance.green != 0) startColor.green += mStartColorVariance.green * (Math.random() * 2.0 - 1.0);
         if (mStartColorVariance.blue != 0)  startColor.blue  += mStartColorVariance.blue  * (Math.random() * 2.0 - 1.0);
         if (mStartColorVariance.alpha != 0) startColor.alpha += mStartColorVariance.alpha * (Math.random() * 2.0 - 1.0);
-        
+
         var endColorRed:Float   = mEndColor.red;
         var endColorGreen:Float = mEndColor.green;
         var endColorBlue:Float  = mEndColor.blue;
@@ -184,29 +183,29 @@ class PDParticleSystem extends ParticleSystem
         if (mEndColorVariance.green != 0) endColorGreen += mEndColorVariance.green * (Math.random() * 2.0 - 1.0);
         if (mEndColorVariance.blue != 0)  endColorBlue  += mEndColorVariance.blue  * (Math.random() * 2.0 - 1.0);
         if (mEndColorVariance.alpha != 0) endColorAlpha += mEndColorVariance.alpha * (Math.random() * 2.0 - 1.0);
-        
+
         colorDelta.red   = (endColorRed   - startColor.red)   / lifespan;
         colorDelta.green = (endColorGreen - startColor.green) / lifespan;
         colorDelta.blue  = (endColorBlue  - startColor.blue)  / lifespan;
         colorDelta.alpha = (endColorAlpha - startColor.alpha) / lifespan;
-        
+
         // rotation
-        
+
         var startRotation:Float = mStartRotation + mStartRotationVariance * (Math.random() * 2.0 - 1.0);
         var endRotation:Float   = mEndRotation   + mEndRotationVariance   * (Math.random() * 2.0 - 1.0);
-        
+
         particle.rotation = startRotation;
         particle.rotationDelta = (endRotation - startRotation) / lifespan;
     }
-    
+
     private override function advanceParticle(aParticle:Particle, passedTime:Float):Void
     {
         var particle:PDParticle = cast aParticle;
-        
+
         var restTime:Float = particle.totalTime - particle.currentTime;
         passedTime = restTime > passedTime ? passedTime : restTime;
         particle.currentTime += passedTime;
-        
+
         if (mEmitterType == EMITTER_TYPE_RADIAL)
         {
             particle.emitRotation += particle.emitRotationDelta * passedTime;
@@ -220,42 +219,42 @@ class PDParticleSystem extends ParticleSystem
             var distanceY:Float = particle.y - particle.startY;
             var distanceScalar:Float = Math.sqrt(distanceX*distanceX + distanceY*distanceY);
             if (distanceScalar < 0.01) distanceScalar = 0.01;
-            
+
             var radialX:Float = distanceX / distanceScalar;
             var radialY:Float = distanceY / distanceScalar;
             var tangentialX:Float = radialX;
             var tangentialY:Float = radialY;
-            
+
             radialX *= particle.radialAcceleration;
             radialY *= particle.radialAcceleration;
-            
+
             var newY:Float = tangentialX;
             tangentialX = -tangentialY * particle.tangentialAcceleration;
             tangentialY = newY * particle.tangentialAcceleration;
-            
+
             particle.velocityX += passedTime * (mGravityX + radialX + tangentialX);
             particle.velocityY += passedTime * (mGravityY + radialY + tangentialY);
             particle.x += particle.velocityX * passedTime;
             particle.y += particle.velocityY * passedTime;
         }
-        
+
         particle.scale += particle.scaleDelta * passedTime;
         particle.rotation += particle.rotationDelta * passedTime;
-        
+
         particle.colorArgb.red   += particle.colorArgbDelta.red   * passedTime;
         particle.colorArgb.green += particle.colorArgbDelta.green * passedTime;
         particle.colorArgb.blue  += particle.colorArgbDelta.blue  * passedTime;
         particle.colorArgb.alpha += particle.colorArgbDelta.alpha * passedTime;
-        
+
         particle.color = particle.colorArgb.toRgb();
         particle.alpha = particle.colorArgb.alpha;
     }
-    
+
     private function updateEmissionRate():Void
     {
         emissionRate = mMaxNumParticles / mLifespan;
     }
-    
+
     private function parseConfig(config:String):Void
     {
         var xml = new Access(Xml.parse(config).firstElement());
@@ -296,10 +295,10 @@ class PDParticleSystem extends ParticleSystem
         mEndColorVariance = getColor(config.finishColorVariance);
         mBlendFactorSource = getBlendFunc(config.blendFuncSource);
         mBlendFactorDestination = getBlendFunc(config.blendFuncDestination);
-        
+
         // compatibility with future Particle Designer versions
         // (might fix some of the uppercase/lowercase typos)
-        
+
         if (xml.hasNode.particleLifeSpan)
             mLifespan = Math.max(0.01, getFloatValue(config.particleLifeSpan));
         else if (xml.hasNode.particleLifespan)
@@ -313,12 +312,12 @@ class PDParticleSystem extends ParticleSystem
         else
             mMinRadiusVariance = 0.0;
     }
-    
+
     private function getIntValue(element:Access):Int
     {
         return Std.parseInt(element.att.value);
     }
-    
+
     private function getFloatValue(element:Access):Float
     {
         return Std.parseFloat(element.att.value);
@@ -352,7 +351,7 @@ class PDParticleSystem extends ParticleSystem
             default:    throw new ArgumentError("unsupported blending function: " + value);
         }
     }
-    
+
     private function get_emitterType():Int { return mEmitterType; }
     private function set_emitterType(value:Int):Int { return mEmitterType = value; }
 
@@ -364,16 +363,16 @@ class PDParticleSystem extends ParticleSystem
 
     private function get_maxNumParticles():Int { return mMaxNumParticles; }
     private function set_maxNumParticles(value:Int):Int
-    { 
+    {
         maxCapacity = value;
-        mMaxNumParticles = maxCapacity; 
-        updateEmissionRate(); 
+        mMaxNumParticles = maxCapacity;
+        updateEmissionRate();
         return value;
     }
 
     private function get_lifespan():Float { return mLifespan; }
     private function set_lifespan(value:Float):Float
-    { 
+    {
         mLifespan = Math.max(0.01, value);
         updateEmissionRate();
         return value;
@@ -405,13 +404,13 @@ class PDParticleSystem extends ParticleSystem
 
     private function get_startRotationVariance():Float { return mStartRotationVariance; }
     private function set_startRotationVariance(value:Float):Float { return mStartRotationVariance = value; }
-    
+
     private function get_endRotation():Float { return mEndRotation; }
     private function set_endRotation(value:Float):Float { return mEndRotation = value; }
-    
+
     private function get_endRotationVariance():Float { return mEndRotationVariance; }
     private function set_endRotationVariance(value:Float):Float { return mEndRotationVariance = value; }
-    
+
     private function get_speed():Float { return mSpeed; }
     private function set_speed(value:Float):Float { return mSpeed = value; }
 

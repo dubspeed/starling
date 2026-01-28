@@ -10,11 +10,10 @@
 
 package starling.display;
 
-import flash.errors.ArgumentError;
-import flash.geom.Rectangle;
-import flash.ui.Mouse;
-import flash.ui.MouseCursor;
-
+import openfl.errors.ArgumentError;
+import openfl.geom.Rectangle;
+import openfl.ui.Mouse;
+import openfl.ui.MouseCursor;
 import starling.events.Event;
 import starling.events.Touch;
 import starling.events.TouchEvent;
@@ -28,14 +27,14 @@ import starling.utils.VAlign;
 @:meta(Event(name="triggered", type="starling.events.Event"))
 
 /** A simple button composed of an image and, optionally, text.
- *  
+ *
  *  <p>You can use different textures for various states of the button. If you're providing
  *  only an up state, the button is simply scaled a little when it is touched.</p>
  *
  *  <p>In addition, you can overlay text on the button. To customize the text, you can use
  *  properties equivalent to those of the TextField class. Move the text to a certain position
  *  by updating the <code>textBounds</code> property.</p>
- *  
+ *
  *  <p>To react on touches on a button, there is special <code>Event.TRIGGERED</code> event.
  *  Use this event instead of normal touch events. That way, users can cancel button
  *  activation by moving the mouse/finger away from the button before releasing.</p>
@@ -43,18 +42,18 @@ import starling.utils.VAlign;
 class Button extends DisplayObjectContainer
 {
     private static inline var MAX_DRAG_DIST:Float = 50;
-    
+
     private var mUpState:Texture;
     private var mDownState:Texture;
     private var mOverState:Texture;
     private var mDisabledState:Texture;
-    
+
     private var mContents:Sprite;
     private var mBody:Image;
     private var mTextField:TextField;
     private var mTextBounds:Rectangle;
     private var mOverlay:Sprite;
-    
+
     private var mScaleWhenDown:Float;
     private var mScaleWhenOver:Float;
     private var mAlphaWhenDown:Float;
@@ -72,7 +71,7 @@ class Button extends DisplayObjectContainer
     {
         super();
         if (upState == null) throw new ArgumentError("Texture 'upState' cannot be null");
-        
+
         mUpState = upState;
         mDownState = downState;
         mOverState = overState;
@@ -87,26 +86,26 @@ class Button extends DisplayObjectContainer
         mUseHandCursor = true;
         mTextBounds = new Rectangle(0, 0, mBody.width, mBody.height);
         mTriggerBounds = new Rectangle();
-        
+
         mContents = new Sprite();
         mContents.addChild(mBody);
         addChild(mContents);
         addEventListener(TouchEvent.TOUCH, __onTouch);
-        
+
         this.touchGroup = true;
         this.text = text;
     }
-    
+
     /** @inheritDoc */
     public override function dispose():Void
     {
         // text field might be disconnected from parent, so we have to dispose it manually
         if (mTextField != null)
             mTextField.dispose();
-        
+
         super.dispose();
     }
-    
+
     /** Readjusts the dimensions of the button according to its current state texture.
      * Call this method to synchronize button and texture size after assigning a texture
      * with a different size. Per default, this method also resets the bounds of the
@@ -130,18 +129,18 @@ class Button extends DisplayObjectContainer
             mTextField.autoScale = true;
             mTextField.batchable = true;
         }
-        
+
         mTextField.width  = mTextBounds.width;
         mTextField.height = mTextBounds.height;
         mTextField.x = mTextBounds.x;
         mTextField.y = mTextBounds.y;
     }
-    
+
     private override function __onTouch(event:TouchEvent):Void
     {
         Mouse.cursor = (mUseHandCursor && mEnabled && event.interactsWith(this)) ?
             MouseCursor.BUTTON : MouseCursor.AUTO;
-        
+
         var touch:Touch = event.getTouch(this);
         var isWithinBounds:Bool;
 
@@ -185,7 +184,7 @@ class Button extends DisplayObjectContainer
             if (!touch.cancelled) dispatchEventWith(Event.TRIGGERED, true);
         }
     }
-    
+
     /** The current state of the button. The corresponding strings are found
      * in the ButtonState class. */
     public var state(get, set):String;
@@ -271,7 +270,7 @@ class Button extends DisplayObjectContainer
         if (mState == ButtonState.DISABLED) __refreshState();
         return value;
     }
-    
+
     /** Indicates if the button can be triggered. */
     public var enabled(get, set):Bool;
     private function get_enabled():Bool { return mEnabled; }
@@ -284,7 +283,7 @@ class Button extends DisplayObjectContainer
         }
         return value;
     }
-    
+
     /** The text that is displayed on the button. */
     public var text(get, set):String;
     private function get_text():String { return mTextField != null ? mTextField.text : ""; }
@@ -302,13 +301,13 @@ class Button extends DisplayObjectContainer
         {
             __createTextField();
             mTextField.text = value;
-            
+
             if (mTextField.parent == null)
                 mContents.addChild(mTextField);
         }
         return value;
     }
-    
+
     /** The name of the font displayed on the button. May be a system font or a registered
      * bitmap font. */
     public var fontName(get, set):String;
@@ -319,7 +318,7 @@ class Button extends DisplayObjectContainer
         mTextField.fontName = value;
         return value;
     }
-    
+
     /** The size of the font. */
     public var fontSize(get, set):Float;
     private function get_fontSize():Float { return mTextField != null ? mTextField.fontSize : 12; }
@@ -329,7 +328,7 @@ class Button extends DisplayObjectContainer
         mTextField.fontSize = value;
         return value;
     }
-    
+
     /** The color of the font. */
     public var fontColor(get, set):UInt;
     private function get_fontColor():UInt { return mTextField != null ? mTextField.color : 0x0; }
@@ -339,7 +338,7 @@ class Button extends DisplayObjectContainer
         mTextField.color = value;
         return value;
     }
-    
+
     /** Indicates if the font should be bold. */
     public var fontBold(get, set):Bool;
     private function get_fontBold():Bool { return mTextField != null ? mTextField.bold : false; }
@@ -349,7 +348,7 @@ class Button extends DisplayObjectContainer
         mTextField.bold = value;
         return value;
     }
-    
+
     /** The texture that is displayed when the button is not being touched. */
     public var upState(get, set):Texture;
     private function get_upState():Texture { return mUpState; }
@@ -371,7 +370,7 @@ class Button extends DisplayObjectContainer
         }
         return value;
     }
-    
+
     /** The texture that is displayed while the button is touched. */
     public var downState(get, set):Texture;
     private function get_downState():Texture { return mDownState; }
@@ -410,35 +409,35 @@ class Button extends DisplayObjectContainer
         }
         return value;
     }
-    
+
     /** The vertical alignment of the text on the button. */
     public var textVAlign(get, set):String;
     private function get_textVAlign():String
     {
         return mTextField != null ? mTextField.vAlign : VAlign.CENTER;
     }
-    
+
     private function set_textVAlign(value:String):String
     {
         __createTextField();
         mTextField.vAlign = value;
         return value;
     }
-    
+
     /** The horizontal alignment of the text on the button. */
     public var textHAlign(get, set):String;
     private function get_textHAlign():String
     {
         return mTextField != null ? mTextField.hAlign : HAlign.CENTER;
     }
-    
+
     private function set_textHAlign(value:String):String
     {
         __createTextField();
         mTextField.hAlign = value;
         return value;
     }
-    
+
     /** The bounds of the textfield on the button. Allows moving the text to a custom position. */
     public var textBounds(get, set):Rectangle;
     private function get_textBounds():Rectangle { return mTextBounds.clone(); }
@@ -448,7 +447,7 @@ class Button extends DisplayObjectContainer
         __createTextField();
         return value;
     }
-    
+
     /** The color of the button's state image. Just like every image object, each pixel's
      * color is multiplied with this value. @default white */
     public var color(get, set):UInt;
@@ -471,7 +470,7 @@ class Button extends DisplayObjectContainer
         return mOverlay;
     }
 
-    /** Indicates if the mouse cursor should transform into a hand while it's over the button. 
+    /** Indicates if the mouse cursor should transform into a hand while it's over the button.
      * @default true */
     private override function get_useHandCursor():Bool { return mUseHandCursor; }
     private override function set_useHandCursor(value:Bool):Bool { return mUseHandCursor = value; }

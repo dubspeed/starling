@@ -10,17 +10,16 @@
 
 package starling.display;
 
-import flash.errors.Error;
-import flash.geom.Matrix;
-import flash.geom.Matrix3D;
-import flash.geom.Point;
-import flash.geom.Vector3D;
-
+import openfl.errors.Error;
+import openfl.geom.Matrix3D;
+import openfl.geom.Matrix;
+import openfl.geom.Point;
+import openfl.geom.Vector3D;
 import starling.core.RenderSupport;
 import starling.events.Event;
+import starling.utils.MathUtil.rad2deg;
 import starling.utils.MathUtil;
 import starling.utils.MatrixUtil;
-import starling.utils.MathUtil.rad2deg;
 
 /** A container that allows you to position objects in three-dimensional space.
  *

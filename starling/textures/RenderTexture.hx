@@ -10,13 +10,12 @@
 
 package starling.textures;
 
-import flash.display3D.Context3D;
-import flash.display3D.Context3DTextureFormat;
-import flash.display3D.VertexBuffer3D;
-import flash.display3D.textures.TextureBase;
-import flash.geom.Matrix;
-import flash.geom.Rectangle;
-
+import openfl.display3D.Context3D;
+import openfl.display3D.Context3DTextureFormat;
+import openfl.display3D.VertexBuffer3D;
+import openfl.display3D.textures.TextureBase;
+import openfl.geom.Matrix;
+import openfl.geom.Rectangle;
 import starling.core.RenderSupport;
 import starling.core.Starling;
 import starling.display.BlendMode;
@@ -24,23 +23,23 @@ import starling.display.DisplayObject;
 import starling.display.Image;
 import starling.errors.MissingContextError;
 import starling.filters.FragmentFilter;
-import starling.utils.SystemUtil;
 import starling.utils.PowerOfTwo.getNextPowerOfTwo;
+import starling.utils.SystemUtil;
 
 /** A RenderTexture is a dynamic texture onto which you can draw any display object.
- * 
- *  <p>After creating a render texture, just call the <code>drawObject</code> method to render 
+ *
+ *  <p>After creating a render texture, just call the <code>drawObject</code> method to render
  *  an object directly onto the texture. The object will be drawn onto the texture at its current
- *  position, adhering its current rotation, scale and alpha properties.</p> 
- *  
- *  <p>Drawing is done very efficiently, as it is happening directly in graphics memory. After 
- *  you have drawn objects onto the texture, the performance will be just like that of a normal 
+ *  position, adhering its current rotation, scale and alpha properties.</p>
+ *
+ *  <p>Drawing is done very efficiently, as it is happening directly in graphics memory. After
+ *  you have drawn objects onto the texture, the performance will be just like that of a normal
  *  texture - no matter how many objects you have drawn.</p>
- *  
- *  <p>If you draw lots of objects at once, it is recommended to bundle the drawing calls in 
- *  a block via the <code>drawBundled</code> method, like shown below. That will speed it up 
+ *
+ *  <p>If you draw lots of objects at once, it is recommended to bundle the drawing calls in
+ *  a block via the <code>drawBundled</code> method, like shown below. That will speed it up
  *  immensely, allowing you to draw hundreds of objects very quickly.</p>
- *  
+ *
  * 	<pre>
  *  renderTexture.drawBundled(function():void
  *  {
@@ -48,13 +47,13 @@ import starling.utils.PowerOfTwo.getNextPowerOfTwo;
  *     {
  *         image.rotation = (2 &#42; Math.PI / numDrawings) &#42; i;
  *         renderTexture.draw(image);
- *     }   
+ *     }
  *  });
  *  </pre>
- *  
+ *
  *  <p>To erase parts of a render texture, you can use any display object like a "rubber" by
  *  setting its blending mode to "BlendMode.ERASE".</p>
- * 
+ *
  *  <p>Beware that render textures can't be restored when the Starling's render context is lost.
  *  </p>
  *
@@ -72,7 +71,7 @@ class RenderTexture extends SubTexture
 {
     private static inline var CONTEXT_POT_SUPPORT_KEY:String = "RenderTexture.supportsNonPotDimensions";
     private static inline var PMA:Bool = true;
-    
+
     private var mActiveTexture:Texture;
     private var mBufferTexture:Texture;
     private var mHelperImage:Image;
@@ -80,10 +79,10 @@ class RenderTexture extends SubTexture
     private var mBufferReady:Bool;
     private var mIsPersistent:Bool;
     private var mSupport:RenderSupport;
-    
+
     /** helper object */
     private static var sClipRect:Rectangle = new Rectangle();
-    
+
     /** Indicates if new persistent textures should use a single render buffer instead of
      * the default double buffering approach. That's faster and requires less memory, but is
      * not supported on all hardware.
@@ -130,16 +129,16 @@ class RenderTexture extends SubTexture
 
         mActiveTexture = Texture.empty(legalWidth, legalHeight, PMA, false, true, scale, format, repeat);
         mActiveTexture.root.onRestore = mActiveTexture.root.clear;
-        
+
         super(mActiveTexture, new Rectangle(0, 0, width, height), true, null, false);
-        
+
         var rootWidth:Float  = mActiveTexture.root.width;
         var rootHeight:Float = mActiveTexture.root.height;
-        
+
         mIsPersistent = persistent;
         mSupport = new RenderSupport();
         mSupport.setProjectionMatrix(0, 0, rootWidth, rootHeight, width, height);
-        
+
         if (persistent && (!optimizePersistentBuffers || !SystemUtil.supportsRelaxedTargetClearRequirement))
         {
             mBufferTexture = Texture.empty(legalWidth, legalHeight, PMA, false, true, scale, format, repeat);
@@ -148,27 +147,27 @@ class RenderTexture extends SubTexture
             mHelperImage.smoothing = TextureSmoothing.NONE; // solves some antialias-issues
         }
     }
-    
+
     /** @inheritDoc */
     public override function dispose():Void
     {
         mSupport.dispose();
         mActiveTexture.dispose();
-        
+
         if (isDoubleBuffered)
         {
             mBufferTexture.dispose();
             mHelperImage.dispose();
         }
-        
+
         super.dispose();
     }
-    
+
     /** Draws an object into the texture. Note that any filters on the object will currently
      * be ignored.
-     * 
+     *
      * @param object       The object to draw.
-     * @param matrix       If 'matrix' is null, the object will be drawn adhering its 
+     * @param matrix       If 'matrix' is null, the object will be drawn adhering its
      *                     properties for position, scale, and rotation. If it is not null,
      *                     the object will be drawn in the orientation depicted by the matrix.
      * @param alpha        The object's alpha value will be multiplied with this value.
@@ -179,18 +178,18 @@ class RenderTexture extends SubTexture
                          antiAliasing:Int=0):Void
     {
         if (object == null) return;
-        
+
         if (mDrawing)
             render(object, matrix, alpha);
         else
             renderBundled(render, object, matrix, alpha, antiAliasing);
     }
-    
-    /** Bundles several calls to <code>draw</code> together in a block. This avoids buffer 
+
+    /** Bundles several calls to <code>draw</code> together in a block. This avoids buffer
      * switches and allows you to draw multiple objects into a non-persistent texture.
      * Note that the 'antiAliasing' setting provided here overrides those provided in
      * individual 'draw' calls.
-     * 
+     *
      * @param drawingBlock  a callback with the form: <pre>function():void;</pre>
      * @param antiAliasing  Only supported beginning with AIR 13, and only on Desktop.
      *                      Values range from 0 (no antialiasing) to 4 (best quality). */
@@ -198,7 +197,7 @@ class RenderTexture extends SubTexture
     {
         renderBundled(drawingBlock, null, null, 1.0, antiAliasing);
     }
-    
+
     private function render(object:DisplayObject, matrix:Matrix=null, alpha:Float=1.0):Void
     {
         var filter:FragmentFilter = object.filter;
@@ -218,7 +217,7 @@ class RenderTexture extends SubTexture
 
         if (mask != null)   mSupport.popMask();
     }
-    
+
     private function renderBundled(renderBlock:DisplayObject->Matrix->Float->Void, object:DisplayObject=null,
                                    matrix:Matrix=null, alpha:Float=1.0,
                                    antiAliasing:Int=0):Void
@@ -237,13 +236,13 @@ class RenderTexture extends SubTexture
         }
 
         var previousRenderTarget:Texture = mSupport.renderTarget;
-        
+
         // limit drawing to relevant area
         sClipRect.setTo(0, 0, mActiveTexture.width, mActiveTexture.height);
 
         mSupport.pushClipRect(sClipRect);
         mSupport.setRenderTarget(mActiveTexture, antiAliasing);
-        
+
         if (isDoubleBuffered || !isPersistent || !mBufferReady)
             mSupport.clear();
 
@@ -252,7 +251,7 @@ class RenderTexture extends SubTexture
             mHelperImage.render(mSupport, 1.0);
         else
             mBufferReady = true;
-        
+
         try
         {
             mDrawing = true;
@@ -267,7 +266,7 @@ class RenderTexture extends SubTexture
             mSupport.popClipRect();
         }
     }
-    
+
     /** Clears the render texture with a certain color and alpha value. Call without any
      * arguments to restore full transparency. */
     public function clear(rgb:UInt=0, alpha:Float=0.0):Void
@@ -280,7 +279,7 @@ class RenderTexture extends SubTexture
         mSupport.renderTarget = previousRenderTarget;
         mBufferReady = true;
     }
-    
+
     /** On the iPad 1 (and maybe other hardware?) clearing a non-POT RectangleTexture causes
      * an error in the next "createVertexBuffer" call. Thus, we're forced to make this
      * really...elegant check here. */
@@ -341,10 +340,10 @@ class RenderTexture extends SubTexture
     /** Indicates if the texture is persistent over multiple draw calls. */
     public var isPersistent(get, never):Bool;
     private function get_isPersistent():Bool { return mIsPersistent; }
-    
+
     /** @inheritDoc */
     private override function get_base():TextureBase { return mActiveTexture.base; }
-    
+
     /** @inheritDoc */
     private override function get_root():ConcreteTexture { return mActiveTexture.root; }
 }

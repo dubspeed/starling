@@ -1,6 +1,5 @@
 package scenes;
-import flash.geom.Point;
-
+import openfl.geom.Point;
 import starling.core.Starling;
 import starling.display.Canvas;
 import starling.display.Image;
@@ -17,20 +16,20 @@ import starling.text.TextField;
     private var mContents:Sprite;
     private var mMask2:Canvas;
     private var mMaskDisplay:Canvas;
-    
+
     public function new()
     {
         super();
         mContents = new Sprite();
         addChild(mContents);
-        
+
         var stageWidth:Float  = Starling.current.stage.stageWidth;
         var stageHeight:Float = Starling.current.stage.stageHeight;
-        
+
         var touchQuad:Quad = new Quad(stageWidth, stageHeight);
         touchQuad.alpha = 0; // only used to get touch events
         addChildAt(touchQuad, 0);
-        
+
         var image:Image = new Image(Game.assets.getTexture("flight_00"));
         image.x = (stageWidth - image.width) / 2;
         image.y = 80;
@@ -40,14 +39,14 @@ import starling.text.TextField;
         var cm:ColorMatrixFilter = new ColorMatrixFilter();
         cm.adjustHue(-0.5);
         image.filter = cm;
-        
+
         var maskText:TextField = new TextField(256, 128,
             "Move the mouse (or a finger) over the screen to move the mask.");
         maskText.x = (stageWidth - maskText.width) / 2;
         maskText.y = 260;
         maskText.fontSize = 20;
         mContents.addChild(maskText);
-        
+
         mMaskDisplay = createCircle();
         mMaskDisplay.alpha = 0.1;
         mMaskDisplay.touchable = false;
@@ -55,10 +54,10 @@ import starling.text.TextField;
 
         mMask2 = createCircle();
         mContents.mask = mMask2;
-        
+
         addEventListener(TouchEvent.TOUCH, onTouch);
     }
-    
+
     private function onTouch(event:TouchEvent):Void
     {
         var touch:Touch = event.getTouch(this, TouchPhase.HOVER);

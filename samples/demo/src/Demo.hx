@@ -1,20 +1,17 @@
 package;
 
-import flash.display.Bitmap;
-import flash.display.Sprite;
-import flash.display3D.Context3DRenderMode;
-import flash.errors.Error;
-import flash.geom.Rectangle;
-import flash.system.Capabilities;
-import flash.system.System;
-import openfl.display.StageScaleMode;
-import openfl.utils.ByteArray;
-
 import haxe.Timer;
-
 import openfl.Assets;
 import openfl.Vector;
-
+import openfl.display.Bitmap;
+import openfl.display.Sprite;
+import openfl.display.StageScaleMode;
+import openfl.display3D.Context3DRenderMode;
+import openfl.errors.Error;
+import openfl.geom.Rectangle;
+import openfl.system.Capabilities;
+import openfl.system.System;
+import openfl.utils.ByteArray;
 import starling.core.Starling;
 import starling.display.Stage;
 import starling.events.Event;
@@ -26,7 +23,6 @@ import starling.textures.TextureAtlas;
 import starling.utils.AssetManager;
 import starling.utils.Max;
 import starling.utils.RectangleUtil;
-
 import utils.ProgressBar;
 
 class Demo extends Sprite
@@ -45,9 +41,9 @@ class Demo extends Sprite
     private function onAddedToStage(event:Dynamic):Void
     {
         removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-		
+
 		stage.scaleMode = StageScaleMode.NO_SCALE;
-		
+
         start();
     }
 
@@ -70,7 +66,7 @@ class Demo extends Sprite
         {
             loadAssets(startGame);
         });
-        
+
         this.stage.addEventListener(Event.RESIZE, onResize, false, Max.INT_MAX_VALUE, true);
 
         mStarling.start();
@@ -85,7 +81,7 @@ class Demo extends Sprite
 
         Timer.delay(function()
         {
-            
+
             var atlasTexture:Texture = Texture.fromBitmapData(Assets.getBitmapData("assets/textures/1x/atlas.png"), false);
             var atlasXml:Xml = Xml.parse(Assets.getText("assets/textures/1x/atlas.xml")).firstElement();
             var desyrelTexture:Texture = Texture.fromBitmapData(Assets.getBitmapData("assets/fonts/1x/desyrel.png"), false);
@@ -101,7 +97,7 @@ class Demo extends Sprite
             #end
             var compressedTexture:ByteArray = Assets.getBytes("assets/textures/1x/compressed_texture.atf");
             assets.addByteArray("compressed_texture", compressedTexture);
-            
+
             onComplete(assets);
         }, 0);
     }
@@ -143,7 +139,7 @@ class Demo extends Sprite
             mProgressBar = null;
         }
     }
-    
+
     private function onResize(e:openfl.events.Event):Void
     {
         var viewPort:Rectangle = RectangleUtil.fit(new Rectangle(0, 0, Constants.GameWidth, Constants.GameHeight), new Rectangle(0, 0, stage.stageWidth, stage.stageHeight));
