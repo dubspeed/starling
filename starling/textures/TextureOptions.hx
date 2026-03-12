@@ -23,6 +23,7 @@ class TextureOptions
     private var mOptimizeForRenderToTexture:Bool = false;
     private var mOnReady:Void->Void = null;
     private var mRepeat:Bool = false;
+    private var mPremultipliedAlpha:Bool = false;
 
     public function new(scale:Float=1.0, mipMapping:Bool=false,
                                    format:Context3DTextureFormat=BGRA, repeat:Bool=false)
@@ -39,6 +40,7 @@ class TextureOptions
         var clone:TextureOptions = new TextureOptions(mScale, mMipMapping, mFormat, mRepeat);
         clone.mOptimizeForRenderToTexture = mOptimizeForRenderToTexture;
         clone.mOnReady = mOnReady;
+        clone.mPremultipliedAlpha = mPremultipliedAlpha;
         return clone;
     }
 
@@ -87,4 +89,9 @@ class TextureOptions
     public var onReady(get, set):Void->Void;
     private function get_onReady():Void->Void { return mOnReady; }
     private function set_onReady(value:Void->Void):Void->Void { return mOnReady = value; }
+
+    /** Indicates if the texture contains premultiplied alpha values. Default: false. */
+    public var premultipliedAlpha(get, set):Bool;
+    private function get_premultipliedAlpha():Bool { return mPremultipliedAlpha; }
+    private function set_premultipliedAlpha(value:Bool):Bool { return mPremultipliedAlpha = value; }
 }

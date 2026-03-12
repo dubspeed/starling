@@ -258,9 +258,10 @@ class Texture
                                           optimizeForRenderToTexture:Bool=false,
                                           scale:Float=1, format:Context3DTextureFormat=BGRA,
                                           repeat:Bool = false,
-										  async:Dynamic = null):Texture
+										  async:Dynamic = null,
+										  premultipliedAlpha:Bool = true):Texture
     {
-        var texture:Texture = Texture.empty(data.width / scale, data.height / scale, true,
+        var texture:Texture = Texture.empty(data.width / scale, data.height / scale, premultipliedAlpha,
                                             generateMipMaps, optimizeForRenderToTexture, scale,
                                             format, repeat);
 
@@ -282,7 +283,8 @@ class Texture
      * asynchronously. It can only be used when the callback has been executed. This is the
      * expected function definition: <code>function(texture:Texture):void;</code></p> */
     public static function fromAtfData(data:ByteArray, scale:Float=1, useMipMaps:Bool=true,
-                                       async:Void->Void=null, repeat:Bool=false):Texture
+                                       async:Void->Void=null, repeat:Bool=false,
+                                       premultipliedAlpha:Bool=false):Texture
     {
         if (data == null) return null;
 		var context:Context3D = Starling.current.context;
@@ -293,7 +295,7 @@ class Texture
             atfData.width, atfData.height, atfData.format, false);
         var concreteTexture:ConcreteTexture = new ConcreteTexture(nativeTexture, atfData.format,
             atfData.width, atfData.height, useMipMaps && atfData.numTextures > 1,
-            false, false, scale, repeat);
+            premultipliedAlpha, false, scale, repeat);
 
         concreteTexture.uploadAtfData(data, 0, async);
         concreteTexture.onRestore = function():Void
