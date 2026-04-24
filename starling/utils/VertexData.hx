@@ -133,13 +133,16 @@ class VertexData
 
         if (matrix != null)
         {
+            // Cache matrix fields to avoid repeated property access in tight loop
+            var ma = matrix.a, mb = matrix.b, mc = matrix.c;
+            var md = matrix.d, mtx = matrix.tx, mty = matrix.ty;
             while (sourceIndex < sourceEnd)
             {
                 x = mRawData[sourceIndex++];
                 y = mRawData[sourceIndex++];
 
-                targetRawData[targetIndex++] = matrix.a * x + matrix.c * y + matrix.tx;
-                targetRawData[targetIndex++] = matrix.d * y + matrix.b * x + matrix.ty;
+                targetRawData[targetIndex++] = ma * x + mc * y + mtx;
+                targetRawData[targetIndex++] = md * y + mb * x + mty;
                 targetRawData[targetIndex++] = mRawData[sourceIndex++];
                 targetRawData[targetIndex++] = mRawData[sourceIndex++];
                 targetRawData[targetIndex++] = mRawData[sourceIndex++];
