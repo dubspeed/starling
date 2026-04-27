@@ -128,12 +128,14 @@ class MatrixUtil
     /** Prepends a matrix to 'base' by multiplying it with another matrix. */
     public static function prependMatrix(base:Matrix, prep:Matrix):Void
     {
-        base.setTo(base.a * prep.a + base.c * prep.b,
-                   base.b * prep.a + base.d * prep.b,
-                   base.a * prep.c + base.c * prep.d,
-                   base.b * prep.c + base.d * prep.d,
-                   base.tx + base.a * prep.tx + base.c * prep.ty,
-                   base.ty + base.b * prep.tx + base.d * prep.ty);
+        final ba = base.a, bb = base.b, bc = base.c, bd = base.d, btx = base.tx, bty = base.ty;
+        final pa = prep.a, pb = prep.b, pc = prep.c, pd = prep.d, ptx = prep.tx, pty = prep.ty;
+        base.setTo(ba * pa + bc * pb,
+                   bb * pa + bd * pb,
+                   ba * pc + bc * pd,
+                   bb * pc + bd * pd,
+                   btx + ba * ptx + bc * pty,
+                   bty + bb * ptx + bd * pty);
     }
 
     /** Prepends an incremental translation to a Matrix object. */

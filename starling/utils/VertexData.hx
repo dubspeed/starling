@@ -134,8 +134,8 @@ class VertexData
         if (matrix != null)
         {
             // Cache matrix fields to avoid repeated property access in tight loop
-            var ma = matrix.a, mb = matrix.b, mc = matrix.c;
-            var md = matrix.d, mtx = matrix.tx, mty = matrix.ty;
+            final ma = matrix.a, mb = matrix.b, mc = matrix.c;
+            final md = matrix.d, mtx = matrix.tx, mty = matrix.ty;
             while (sourceIndex < sourceEnd)
             {
                 x = mRawData[sourceIndex++];
@@ -338,8 +338,8 @@ class VertexData
             var offset:Int = vertexID * ELEMENTS_PER_VERTEX + COLOR_OFFSET + 3;
             for (i in 0...numVertices)
             {
-                var idx:Int = Std.int(offset + i*ELEMENTS_PER_VERTEX);
-                mRawData[idx] = mRawData[idx] * factor;
+                mRawData[offset] *= factor;
+                offset += ELEMENTS_PER_VERTEX;
             }
         }
     }
