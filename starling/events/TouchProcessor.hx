@@ -67,6 +67,7 @@ class TouchProcessor
     private var mCtrlDown:Bool  = false;
     private var mMultitapTime:Float = 0.3;
     private var mMultitapDistance:Float = 25;
+    private var mOcclusionTest:Float->Float->Bool = null;
 
     /** A vector of arrays with the arguments that were passed to the "enqueue"
      * method (the oldest being at the end of the vector). */
@@ -192,7 +193,12 @@ class TouchProcessor
             if (touch.phase == TouchPhase.HOVER || touch.phase == TouchPhase.BEGAN)
             {
                 sHelperPoint.setTo(touch.globalX, touch.globalY);
-                touch.target = mRoot.hitTest(sHelperPoint, true);
+                // If an occlusion test is supplied and turns out positive, the touch is
+                // occluded by a native overlay and must not reach Starling; drop its target.
+                if (mOcclusionTest != null && mOcclusionTest(touch.globalX, touch.globalY))
+                    touch.target = null;
+                else
+                    touch.target = mRoot.hitTest(sHelperPoint, true);
             }
         }
 
@@ -405,6 +411,13 @@ class TouchProcessor
     public var root(get, set):DisplayObject;
     private function get_root():DisplayObject { return mRoot; }
     private function set_root(value:DisplayObject):DisplayObject { return mRoot = value; }
+
+    /** Optional callback (globalX, globalY) -> Bool in stage coordinates. When it returns
+     * true for a touch position, the touch is treated as occluded by a native overlay and
+     * its target is set to null, so Starling does not react to it. @default null */
+    public var occlusionTest(get, set):Float->Float->Bool;
+    private function get_occlusionTest():Float->Float->Bool { return mOcclusionTest; }
+    private function set_occlusionTest(value:Float->Float->Bool):Float->Float->Bool { return mOcclusionTest = value; }
 
     /** The stage object to which the touch objects are (per default) dispatched. */
     public var stage(get, never):Stage;
